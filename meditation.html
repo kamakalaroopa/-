@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冥想指导 · 阿育吠陀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Cinzel:wght@400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5ECD7;
+    --gold: #C8903A;
+    --gold-light: #D4AF70;
+    --brown-deep: #1C0D05;
+    --text-cream: #F0E2C8;
+    --text-muted: #9A7050;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--brown-deep);
+    color: var(--text-cream);
+    min-height: 100vh;
+  }
+
+  .bg-layer {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 20% 10%, #2A1208 0%, transparent 60%),
+                radial-gradient(ellipse 60% 70% at 80% 90%, #1C0D05 0%, transparent 50%),
+                linear-gradient(160deg, #1C0D05 0%, #0E0703 100%);
+    z-index: 0;
+  }
+  .grain {
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03; z-index: 1; pointer-events: none;
+  }
+  .dosha-glow { position: fixed; inset: 0; z-index: 0; }
+
+  .page {
+    position: relative; z-index: 10;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* Nav */
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+  .back-link {
+    font-size: 12px; color: var(--text-muted);
+    text-decoration: none; letter-spacing: 0.1em;
+    transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .back-link:hover { color: var(--gold-light); }
+  .page-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); opacity: 0.7;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center; margin-bottom: 3rem;
+    animation: fadeUp 0.9s ease both;
+  }
+  .hero-icon { margin-bottom: 1rem; line-height: 1; display: flex; justify-content: center; }
+  .hero-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.4em;
+    color: var(--gold-light); opacity: 0.65; margin-bottom: 0.6rem;
+  }
+  .hero-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    font-weight: 300; letter-spacing: 0.1em;
+    color: var(--cream); margin-bottom: 0.8rem;
+  }
+  .hero-title span { font-weight: 400; }
+  .hero-desc {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 300;
+    color: #B89070; line-height: 1.9;
+    letter-spacing: 0.06em; max-width: 480px; margin: 0 auto;
+  }
+
+  /* Tabs */
+  .dosha-tabs {
+    display: flex; gap: 0.6rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+  .tab-btn {
+    flex: 1; padding: 0.6rem 0.5rem;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.15);
+    border-radius: 8px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.08em;
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.25s; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .tab-btn:hover { border-color: rgba(212,175,112,0.35); color: var(--cream); }
+  .tab-btn.active { color: var(--cream); border-width: 1px; }
+
+  /* Section */
+  .section { margin-bottom: 2rem; animation: fadeUp 0.9s 0.15s ease both; }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 0.5px;
+    background: rgba(212,175,112,0.2);
+  }
+
+  /* Principle box */
+  .principle-box {
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    border-left: 2px solid;
+    background: rgba(255,255,255,0.025);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 300;
+    color: #C9A882; line-height: 1.8; letter-spacing: 0.06em;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Timer widget */
+  .timer-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid rgba(212,175,112,0.15);
+    margin-bottom: 1.5rem;
+    position: relative; overflow: hidden;
+  }
+  .timer-ring-wrap {
+    position: relative;
+    width: 160px; height: 160px;
+    margin-bottom: 1.5rem;
+  }
+  .timer-svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 3; }
+  .timer-progress {
+    fill: none; stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+  }
+  .timer-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .timer-display {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem; font-weight: 400;
+    letter-spacing: 0.05em; line-height: 1;
+  }
+  .timer-label {
+    font-size: 10px; letter-spacing: 0.2em;
+    color: var(--text-muted); margin-top: 4px;
+  }
+  .timer-phase {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; color: #C9A882;
+    letter-spacing: 0.1em; margin-bottom: 1.5rem;
+    min-height: 1.4em; text-align: center;
+  }
+  .timer-btns {
+    display: flex; gap: 0.8rem;
+  }
+  .timer-btn {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.15em;
+    padding: 0.55rem 1.6rem;
+    border-radius: 60px; cursor: pointer;
+    transition: all 0.25s;
+  }
+  .timer-btn.start {
+    color: var(--cream);
+    border: none;
+    background: linear-gradient(135deg, #C8903A 0%, #A06B22 100%);
+  }
+  .timer-btn.start:hover { box-shadow: 0 4px 16px rgba(200,144,58,0.3); transform: translateY(-1px); }
+  .timer-btn.reset {
+    color: var(--text-muted);
+    background: none;
+    border: 0.5px solid rgba(212,175,112,0.2);
+  }
+  .timer-btn.reset:hover { color: var(--cream); border-color: rgba(212,175,112,0.5); }
+  .timer-duration-row {
+    display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+  }
+  .dur-btn {
+    font-size: 11px; letter-spacing: 0.1em;
+    padding: 4px 14px; border-radius: 60px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.15);
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dur-btn.active, .dur-btn:hover {
+    border-color: rgba(212,175,112,0.45);
+    color: var(--cream);
+  }
+
+  /* Technique cards */
+  .technique-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.9rem; margin-bottom: 1.5rem;
+  }
+  .technique-card {
+    padding: 1.3rem 1.4rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+    transition: all 0.25s;
+  }
+  .technique-card:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(212,175,112,0.28);
+  }
+  .tech-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 0.7rem;
+  }
+  .tech-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .tech-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 400;
+    color: var(--cream); letter-spacing: 0.08em;
+  }
+  .tech-sanskrit {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; letter-spacing: 0.2em;
+    opacity: 0.4; margin-top: 1px;
+  }
+  .tech-desc {
+    font-size: 0.85rem; color: var(--text-muted);
+    line-height: 1.7; letter-spacing: 0.03em;
+    margin-bottom: 0.7rem;
+  }
+  .tech-steps {
+    list-style: none; display: flex; flex-direction: column; gap: 4px;
+  }
+  .tech-steps li {
+    font-size: 12px; color: #8A6040;
+    letter-spacing: 0.04em; line-height: 1.5;
+    display: flex; gap: 8px;
+  }
+  .tech-steps li::before {
+    content: attr(data-n);
+    flex-shrink: 0; opacity: 0.5;
+    font-family: 'Cinzel', serif; font-size: 10px;
+  }
+
+  /* Mantra cards */
+  .mantra-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.8rem;
+  }
+  .mantra-card {
+    padding: 1.2rem 1.2rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid rgba(212,175,112,0.12);
+    text-align: center;
+  }
+  .mantra-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem; letter-spacing: 0.18em;
+    margin-bottom: 0.5rem; line-height: 1.4;
+  }
+  .mantra-meaning {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.8rem; font-weight: 300;
+    color: var(--text-muted); line-height: 1.6;
+    letter-spacing: 0.05em;
+  }
+  .mantra-use {
+    margin-top: 0.6rem;
+    font-size: 11px; letter-spacing: 0.1em;
+    padding: 3px 10px; border-radius: 60px;
+    display: inline-block;
+    border: 0.5px solid;
+  }
+
+  /* Daily ritual */
+  .ritual-timeline {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
+  }
+  .ritual-timeline::before {
+    content: '';
+    position: absolute; left: 20px; top: 0; bottom: 0;
+    width: 0.5px; background: rgba(212,175,112,0.15);
+  }
+  .ritual-item {
+    display: flex; gap: 1.2rem; align-items: flex-start;
+    padding: 0.9rem 0;
+    position: relative;
+  }
+  .ritual-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+    border: 1.5px solid;
+    background: var(--brown-deep);
+    position: relative; z-index: 1;
+    margin-left: 15px;
+  }
+  .ritual-time {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.18em;
+    opacity: 0.5; margin-bottom: 3px; flex-shrink: 0;
+    width: 55px;
+  }
+  .ritual-body {}
+  .ritual-name {
+    font-size: 0.9rem; color: var(--cream);
+    letter-spacing: 0.06em; margin-bottom: 2px;
+  }
+  .ritual-detail {
+    font-size: 12px; color: var(--text-muted);
+    line-height: 1.5; letter-spacing: 0.03em;
+  }
+
+  /* Tip */
+  .tip-box {
+    padding: 1.1rem 1.4rem;
+    border-radius: 10px;
+    background: rgba(212,175,112,0.05);
+    border: 0.5px solid rgba(212,175,112,0.18);
+    font-size: 0.88rem; color: #B89070;
+    line-height: 1.7; letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .tip-box strong { color: var(--gold-light); font-weight: 400; }
+
+  /* Ornament */
+  .ornament-divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 2rem 0;
+  }
+  .ornament-divider-line { height: 0.5px; flex: 1; background: rgba(212,175,112,0.15); }
+  .ornament-divider-symbol { font-size: 14px; color: var(--gold-light); opacity: 0.4; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+    margin-top: 3rem;
+    animation: fadeUp 0.9s 0.4s ease both;
+  }
+  .nav-btn {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: var(--text-muted); text-decoration: none;
+    background: none;
+    border: 0.5px solid rgba(212,175,112,0.2);
+    border-radius: 60px; padding: 0.65rem 1.8rem;
+    cursor: pointer; transition: all 0.25s; display: inline-block;
+  }
+  .nav-btn:hover { color: var(--cream); border-color: rgba(212,175,112,0.5); }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, #C8903A 0%, #A06B22 100%);
+    border-color: rgba(212,175,112,0.4); color: var(--cream);
+  }
+  .nav-btn.primary:hover {
+    box-shadow: 0 4px 20px rgba(200,144,58,0.3);
+    transform: translateY(-1px);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grain"></div>
+<div class="dosha-glow" id="doshaGlow"></div>
+
+<div class="page">
+  <div class="top-nav">
+    <a href="javascript:history.back()" class="back-link">← 返回</a>
+    <div class="page-tag">Dhyāna · 冥想之道</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-icon" id="heroIcon"></div>
+    <div class="hero-sub">专属冥想方案</div>
+    <h1 class="hero-title"><span id="doshaName"></span> 冥想指导</h1>
+    <p class="hero-desc" id="heroPrinciple"></p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dosha-tabs">
+    <button class="tab-btn" onclick="switchDosha('vata')" id="tab-vata">
+      <span>
+        <svg width="22" height="22" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" fill="#4A8C5C" opacity="0.3"/>
+          <path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" stroke="#6B9E78" stroke-width="1.5" stroke-linejoin="round"/>
+          <line x1="10" y1="44" x2="46" y2="9" stroke="#6B9E78" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+        </svg>
+      </span>
+      风型 Vāta
+    </button>
+    <button class="tab-btn" onclick="switchDosha('pitta')" id="tab-pitta">
+      <span style="font-size:1.2rem">🔥</span>
+      火型 Pitta
+    </button>
+    <button class="tab-btn" onclick="switchDosha('kapha')" id="tab-kapha">
+      <span>
+        <svg width="22" height="22" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="26,6 48,44 4,44" fill="#5A3D28" opacity="0.3"/>
+          <polygon points="26,6 48,44 4,44" stroke="#8B6347" stroke-width="1.5" stroke-linejoin="round"/>
+          <polygon points="26,14 42,40 10,40" stroke="#BFA08A" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="26" cy="6" r="1.8" fill="#8B6347"/>
+          <circle cx="48" cy="44" r="1.8" fill="#8B6347"/>
+          <circle cx="4" cy="44" r="1.8" fill="#8B6347"/>
+        </svg>
+      </span>
+      土型 Kapha
+    </button>
+  </div>
+
+  <div id="content"></div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <a href="javascript:history.back()" class="nav-btn">← 返回</a>
+    <a href="result.html" class="nav-btn">回到结果页</a>
+    <a href="ayurveda-cover.html" class="nav-btn primary">✾ 回到首页</a>
+  </div>
+</div>
+
+<script>
+const SVG_VATA_LARGE = `<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" fill="#4A8C5C" opacity="0.25"/><path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" stroke="#6B9E78" stroke-width="1.2" stroke-linejoin="round"/><line x1="10" y1="44" x2="46" y2="9" stroke="#6B9E78" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/><path d="M20 38 Q28 28 38 16" stroke="#A8CDB2" stroke-width="0.8" opacity="0.5"/></svg>`;
+const SVG_KAPHA_LARGE = `<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="26,6 48,44 4,44" fill="#5A3D28" opacity="0.3"/><polygon points="26,6 48,44 4,44" stroke="#8B6347" stroke-width="1.4" stroke-linejoin="round"/><polygon points="26,14 42,40 10,40" stroke="#BFA08A" stroke-width="0.7" opacity="0.5"/><circle cx="26" cy="6" r="1.5" fill="#8B6347"/><circle cx="48" cy="44" r="1.5" fill="#8B6347"/><circle cx="4" cy="44" r="1.5" fill="#8B6347"/></svg>`;
+
+const MEDITATION = {
+  vata: {
+    heroIcon: SVG_VATA_LARGE,
+    name: "风型",
+    color: "#6B9E78",
+    colorLight: "#A8CDB2",
+    glow: "rgba(107,158,120,0.1)",
+    principle: "风型体质思绪飘忽、难以安定，冥想应以「扎根、专注、温暖」为核心。从短时间开始，借助固定的仪式感帮助进入状态。",
+    timerColor: "#6B9E78",
+    timerPhases: ["放松入定", "专注呼吸", "扎根冥想", "深度静止", "轻柔回归"],
+    tip: "<strong>冥想小贴士：</strong>每天同一时间、同一地点练习，仪式感对风型至关重要。可使用温暖的毛毯裹住身体，点燃乳香或檀香，帮助扎根。",
+    techniques: [
+      {
+        icon: "🕯️", name: "烛光冥想", sanskrit: "Trataka",
+        desc: "凝视烛光，让飘忽的思绪随火焰稳定下来，是风型最有效的专注冥想之一。",
+        steps: ["点燃蜡烛置于眼前60cm处", "柔和凝视火焰，不眨眼直到流泪", "闭眼在脑海中保持烛光意象", "重复3-5次，每次3-5分钟"]
+      },
+      {
+        icon: "🌍", name: "身体扫描冥想", sanskrit: "Yoga Nidrā",
+        desc: "从头到脚逐一感知身体各部位，帮助思维回归当下，消除焦虑与游荡。",
+        steps: ["仰卧，全身放松", "从脚趾开始，缓慢向上扫描身体", "感受每个部位的重量与温度", "全程20-45分钟"]
+      },
+      {
+        icon: "🪨", name: "大地观想冥想", sanskrit: "Bhūmi Dhyāna",
+        desc: "观想自己如山岳般稳固，根植大地，是专为风型设计的扎根练习。",
+        steps: ["坐姿，感受臀部与地面的接触", "想象根系从脊柱延伸入地", "每次呼气时感受重力下沉", "保持15-20分钟"]
+      }
+    ],
+    mantras: [
+      { text: "SO HUM", meaning: "我即是那（宇宙本源）\n随呼吸默念：吸气SO，呼气HUM", color: "#6B9E78", use: "安定游荡思绪" },
+      { text: "OM", meaning: "宇宙原音，凝聚散乱\n感受振动从心脏扩散", color: "#A8CDB2", use: "专注扎根" },
+      { text: "RAM", meaning: "火的种子音，带来温暖\n帮助风型获得稳定感", color: "#6B9E78", use: "温暖滋养" }
+    ],
+    ritual: [
+      { time: "起床后", name: "感恩静坐", detail: "坐于床边，双手置膝，深呼吸3次，默念今日意图" },
+      { time: "晨间", name: "扎根冥想", detail: "10-20分钟烛光冥想或SO HUM咒语，建立全天稳定基础" },
+      { time: "午间", name: "正念片刻", detail: "3-5分钟腹式呼吸，重新扎根，避免午后能量涣散" },
+      { time: "傍晚", name: "瑜伽休息术", detail: "20-30分钟Yoga Nidrā，深度修复神经系统" },
+      { time: "睡前", name: "感恩日记", detail: "写下3件感恩的事，安抚焦虑思绪，帮助入眠" }
+    ]
+  },
+  pitta: {
+    heroIcon: `<span style="font-size:3rem">🔥</span>`,
+    name: "火型",
+    color: "#C85A3A",
+    colorLight: "#E89A82",
+    glow: "rgba(200,90,58,0.1)",
+    principle: "火型体质容易在冥想中急于求成，冥想应以「接受、放下、清凉」为核心。学会不追求冥想的「成果」，允许一切如其所是。",
+    timerColor: "#C85A3A",
+    timerPhases: ["冷静入定", "清凉呼吸", "慈悲冥想", "深度放下", "温和回归"],
+    tip: "<strong>冥想小贴士：</strong>避免把冥想变成另一个需要「完成」的任务。练习时若感到烦躁，这本身就是练习的一部分。以月亮意象代替太阳。",
+    techniques: [
+      {
+        icon: "🌊", name: "慈悲心冥想", sanskrit: "Mettā Bhāvanā",
+        desc: "从自身出发，向外扩展慈悲与爱，软化火型容易产生的批判与急躁。",
+        steps: ["先对自己默念：愿我平静、愿我快乐", "扩展至亲近的人，再到陌生人", "最后扩展至所有众生", "每次15-20分钟"]
+      },
+      {
+        icon: "🌙", name: "月光观想冥想", sanskrit: "Chandra Dhyāna",
+        desc: "观想皎洁月光注入体内，清凉所有的内热与急躁，滋养心灵。",
+        steps: ["闭眼，想象头顶有一轮满月", "月光如银色水流缓缓注入全身", "感受所有热度被清凉取代", "保持20分钟"]
+      },
+      {
+        icon: "🍃", name: "开放觉知冥想", sanskrit: "Sahaja Samādhi",
+        desc: "不专注于任何对象，只是开放地觉知当下所有感受，练习放下控制。",
+        steps: ["坐姿放松，不刻意控制呼吸", "允许念头来了又走，不追随", "觉察声音、感受、思绪，不评判", "保持20-30分钟"]
+      }
+    ],
+    mantras: [
+      { text: "OM SHANTI", meaning: "宇宙本音·平静\n反复默念，让急躁在振动中消融", color: "#C85A3A", use: "平息急躁" },
+      { text: "YAM", meaning: "心轮种子音，开放心脏\n软化批判，培养接受与慈悲", color: "#E89A82", use: "开放心脏" },
+      { text: "SO HUM", meaning: "我即宇宙本源\n提醒自己无需证明，已然完整", color: "#C85A3A", use: "放下执着" }
+    ],
+    ritual: [
+      { time: "起床后", name: "冷静意图", detail: "在行动前静坐3分钟，设定今日以「温和」为意图" },
+      { time: "晨间", name: "慈悲冥想", detail: "15-20分钟慈悲心冥想，在一天开始前软化心脏" },
+      { time: "午间", name: "清凉呼吸", detail: "5分钟Shitali呼吸，降低午间累积的内热与压力" },
+      { time: "傍晚", name: "月光冥想", detail: "20分钟月光观想，释放白天积累的紧张与竞争感" },
+      { time: "睡前", name: "感恩放下", detail: "回顾今日做得好的事，练习接受不完美，放下执着" }
+    ]
+  },
+  kapha: {
+    heroIcon: SVG_KAPHA_LARGE,
+    name: "土型",
+    color: "#8B6347",
+    colorLight: "#BFA08A",
+    glow: "rgba(139,99,71,0.1)",
+    principle: "土型体质容易在冥想中陷入昏沉与睡意，冥想应以「激活、专注、精进」为核心。选择坐姿而非卧姿，保持脊柱挺直。",
+    timerColor: "#8B6347",
+    timerPhases: ["激活入定", "能量呼吸", "专注冥想", "深度觉知", "活力回归"],
+    tip: "<strong>冥想小贴士：</strong>若感到昏沉，可睁开双眼半闭，保持向下凝视。清晨练习效果最佳，避免饭后立刻冥想。可使用尤加利或薄荷精油提神。",
+    techniques: [
+      {
+        icon: "🔆", name: "第三眼冥想", sanskrit: "Ājñā Dhyāna",
+        desc: "专注于眉心第三眼位置，激活直觉与内在智慧，打破土型的停滞与惰性。",
+        steps: ["坐直，将注意力集中于眉心", "感受该处轻微的压力或温热", "若分心，温和地将注意力带回", "保持15-25分钟"]
+      },
+      {
+        icon: "🎵", name: "咒语冥想", sanskrit: "Mantra Japa",
+        desc: "持续默念咒语，用声音的振动激活沉重的身心，防止昏沉。",
+        steps: ["手持念珠（108颗）", "每颗念珠默念一遍咒语", "完成一圈为一轮，可做1-3轮", "专注咒语振动，不让思维停滞"]
+      },
+      {
+        icon: "👁️", name: "观想光明冥想", sanskrit: "Jyoti Dhyāna",
+        desc: "在心中央观想一道明亮的光，用内在光明驱散土型的沉重与黑暗。",
+        steps: ["闭眼，将注意力带入心脏中央", "想象一颗小小的金色光球", "每次吸气时光球扩大变亮", "观想光充满全身，保持20分钟"]
+      }
+    ],
+    mantras: [
+      { text: "OM HRIM", meaning: "激活生命力的种子音\n振动能量场，驱散沉重与惰性", color: "#8B6347", use: "激活能量" },
+      { text: "AIM", meaning: "智慧与专注的种子音\n唤醒内在清明，打破停滞", color: "#BFA08A", use: "提升专注" },
+      { text: "OM NAMAH SHIVAYA", meaning: "敬礼内在神性\n与宇宙意识连接，超越个体局限", color: "#8B6347", use: "扩展意识" }
+    ],
+    ritual: [
+      { time: "清晨6点", name: "能量激活", detail: "10次风箱式呼吸，在冥想前激活身体与神经系统" },
+      { time: "晨间", name: "咒语冥想", detail: "20-30分钟念珠咒语，保持坐姿挺直，不让自己昏沉" },
+      { time: "午间", name: "步行冥想", detail: "10分钟正念步行，专注脚步与呼吸，避免饭后昏睡" },
+      { time: "傍晚", name: "第三眼冥想", detail: "15分钟眉心专注，激活直觉，为土型带来轻盈感" },
+      { time: "睡前", name: "轻盈反思", detail: "回顾今日采取了哪些行动，为明日设定一个具体目标" }
+    ]
+  }
+};
+
+// Timer state
+let timerInterval = null;
+let timerRunning = false;
+let timerSeconds = 0;
+let timerTotal = 600;
+let timerPhaseIndex = 0;
+let currentDosha = 'vata';
+
+function getDosha() {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('dosha') || 'vata';
+}
+
+function switchDosha(dosha) {
+  resetTimer();
+  currentDosha = dosha;
+  renderContent();
+  updateTabs();
+}
+
+function updateTabs() {
+  ['vata','pitta','kapha'].forEach(d => {
+    const tab = document.getElementById('tab-' + d);
+    tab.classList.toggle('active', d === currentDosha);
+    tab.style.borderColor = d === currentDosha ? MEDITATION[d].color : '';
+    tab.style.color = d === currentDosha ? MEDITATION[d].colorLight : '';
+  });
+}
+
+function setDuration(mins) {
+  resetTimer();
+  timerTotal = mins * 60;
+  document.querySelectorAll('.dur-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.mins) === mins);
+  });
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const remaining = timerTotal - timerSeconds;
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  const el = document.getElementById('timerDisplay');
+  if (el) el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  const pct = timerSeconds / timerTotal;
+  const r = 68;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - pct);
+  const prog = document.getElementById('timerProgress');
+  if (prog) {
+    prog.style.strokeDasharray = circ;
+    prog.style.strokeDashoffset = offset;
+  }
+
+  const d = MEDITATION[currentDosha];
+  const phaseIdx = Math.min(Math.floor(pct * d.timerPhases.length), d.timerPhases.length - 1);
+  const phaseEl = document.getElementById('timerPhase');
+  if (phaseEl) phaseEl.textContent = timerRunning ? d.timerPhases[phaseIdx] : (timerSeconds === 0 ? '准备开始' : '已暂停');
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('startBtn');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    if (btn) btn.textContent = '继续';
+    updateTimerDisplay();
+  } else {
+    if (timerSeconds >= timerTotal) resetTimer();
+    timerRunning = true;
+    if (btn) btn.textContent = '暂停';
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      updateTimerDisplay();
+      if (timerSeconds >= timerTotal) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        if (btn) btn.textContent = '重新开始';
+        const phaseEl = document.getElementById('timerPhase');
+        if (phaseEl) phaseEl.textContent = '冥想完成 🪷';
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  const btn = document.getElementById('startBtn');
+  if (btn) btn.textContent = '开始冥想';
+  updateTimerDisplay();
+}
+
+function renderContent() {
+  const d = MEDITATION[currentDosha];
+
+  // Hero
+  document.getElementById('heroIcon').innerHTML = d.heroIcon;
+  document.getElementById('doshaName').textContent = d.name;
+  document.getElementById('heroPrinciple').textContent = d.principle;
+  document.getElementById('doshaGlow').style.background =
+    `radial-gradient(ellipse 60% 40% at 50% 20%, ${d.glow} 0%, transparent 70%)`;
+
+  const r = 68;
+  const circ = 2 * Math.PI * r;
+
+  document.getElementById('content').innerHTML = `
+    <!-- Principle -->
+    <div class="section">
+      <div class="section-title">冥想原则</div>
+      <div class="principle-box" style="border-left-color:${d.color}">${d.principle}</div>
+    </div>
+
+    <!-- Timer -->
+    <div class="section">
+      <div class="section-title">冥想计时器</div>
+      <div class="timer-wrap">
+        <div class="timer-duration-row">
+          ${[5,10,15,20].map(m => `<button class="dur-btn${timerTotal===m*60?' active':''}" data-mins="${m}" onclick="setDuration(${m})">${m}分钟</button>`).join('')}
+        </div>
+        <div class="timer-ring-wrap">
+          <svg class="timer-svg" viewBox="0 0 160 160">
+            <circle class="timer-track" cx="80" cy="80" r="${r}"/>
+            <circle id="timerProgress" class="timer-progress" cx="80" cy="80" r="${r}"
+              stroke="${d.timerColor}"
+              style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
+          </svg>
+          <div class="timer-center">
+            <div class="timer-display" id="timerDisplay" style="color:${d.colorLight}">10:00</div>
+            <div class="timer-label">剩余时间</div>
+          </div>
+        </div>
+        <div class="timer-phase" id="timerPhase" style="color:${d.colorLight}">准备开始</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" id="startBtn" onclick="toggleTimer()">开始冥想</button>
+          <button class="timer-btn reset" onclick="resetTimer()">重置</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ornament-divider">
+      <div class="ornament-divider-line"></div>
+      <div class="ornament-divider-symbol">✾</div>
+      <div class="ornament-divider-line"></div>
+    </div>
+
+    <!-- Techniques -->
+    <div class="section">
+      <div class="section-title">冥想技法</div>
+      <div class="technique-grid">
+        ${d.techniques.map(t => `
+          <div class="technique-card">
+            <div class="tech-header">
+              <div class="tech-icon">${t.icon}</div>
+              <div>
+                <div class="tech-name">${t.name}</div>
+                <div class="tech-sanskrit">${t.sanskrit}</div>
+              </div>
+            </div>
+            <div class="tech-desc">${t.desc}</div>
+            <ul class="tech-steps">
+              ${t.steps.map((s,i) => `<li data-n="0${i+1}">${s}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="ornament-divider">
+      <div class="ornament-divider-line"></div>
+      <div class="ornament-divider-symbol">✾</div>
+      <div class="ornament-divider-line"></div>
+    </div>
+
+    <!-- Mantras -->
+    <div class="section">
+      <div class="section-title">专属咒语</div>
+      <div class="mantra-grid">
+        ${d.mantras.map(m => `
+          <div class="mantra-card">
+            <div class="mantra-text" style="color:${m.color}">${m.text}</div>
+            <div class="mantra-meaning">${m.meaning}</div>
+            <span class="mantra-use" style="color:${m.color};border-color:${m.color};background:rgba(0,0,0,0.1)">${m.use}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Daily ritual -->
+    <div class="section">
+      <div class="section-title">每日冥想仪式</div>
+      <div class="tip-box">${d.tip}</div>
+      <div class="ritual-timeline">
+        ${d.ritual.map(r => `
+          <div class="ritual-item">
+            <div class="ritual-dot" style="border-color:${d.color}"></div>
+            <div class="ritual-time" style="color:${d.colorLight}">${r.time}</div>
+            <div class="ritual-body">
+              <div class="ritual-name">${r.name}</div>
+              <div class="ritual-detail">${r.detail}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  updateTimerDisplay();
+}
+
+currentDosha = getDosha();
+renderContent();
+updateTabs();
+</script>
+</body>
+</html>

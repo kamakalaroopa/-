@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你的体质结果 · 阿育吠陀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Cinzel:wght@400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5ECD7;
+    --gold: #C8903A;
+    --gold-light: #D4AF70;
+    --brown-deep: #1C0D05;
+    --text-cream: #F0E2C8;
+    --text-muted: #9A7050;
+
+    --vata-main: #6B9E78;
+    --vata-light: #A8CDB2;
+    --vata-dark: #3D6B4A;
+    --vata-glow: rgba(107,158,120,0.18);
+
+    --pitta-main: #C85A3A;
+    --pitta-light: #E89A82;
+    --pitta-dark: #8B3220;
+    --pitta-glow: rgba(200,90,58,0.18);
+
+    --kapha-main: #8B6347;
+    --kapha-light: #BFA08A;
+    --kapha-dark: #5A3D28;
+    --kapha-glow: rgba(139,99,71,0.18);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--brown-deep);
+    color: var(--text-cream);
+    min-height: 100vh;
+  }
+
+  .bg-layer {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 10%, #2A1208 0%, transparent 60%),
+      radial-gradient(ellipse 60% 70% at 80% 90%, #1C0D05 0%, transparent 50%),
+      linear-gradient(160deg, #1C0D05 0%, #0E0703 100%);
+    z-index: 0;
+  }
+
+  .grain {
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03; z-index: 1; pointer-events: none;
+  }
+
+  /* Dynamic glow based on dosha */
+  .dosha-glow {
+    position: fixed; inset: 0; z-index: 0;
+    transition: background 1s ease;
+  }
+
+  .page {
+    position: relative; z-index: 10;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  /* Back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-muted);
+    text-decoration: none; letter-spacing: 0.1em;
+    margin-bottom: 3rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--gold-light); }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeUp 1s ease both;
+  }
+
+  .dosha-icon-wrap {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 120px; height: 120px;
+    margin: 0 auto 1.5rem;
+  }
+  .dosha-icon-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 0.5px solid;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  .dosha-icon-ring-2 {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    border: 0.5px solid;
+    opacity: 0.5;
+    animation: pulse 3s 1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.06); opacity: 1; }
+  }
+  .dosha-emoji {
+    font-size: 3rem;
+    position: relative; z-index: 2;
+    filter: drop-shadow(0 0 20px currentColor);
+  }
+
+  .result-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 0.4em;
+    color: var(--gold-light); opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .dosha-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+
+  .dosha-sanskrit {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; letter-spacing: 0.25em;
+    opacity: 0.55;
+    margin-bottom: 1rem;
+  }
+
+  .dosha-tagline {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem; font-weight: 300;
+    color: #B89070; line-height: 1.9;
+    letter-spacing: 0.06em;
+    max-width: 420px; margin: 0 auto;
+  }
+
+  /* Dual badge */
+  .dual-badge {
+    display: inline-block;
+    margin-top: 0.8rem;
+    padding: 4px 16px;
+    border-radius: 60px;
+    background: rgba(212,175,112,0.1);
+    border: 0.5px solid rgba(212,175,112,0.3);
+    font-size: 11px; color: var(--gold-light);
+    letter-spacing: 0.15em;
+  }
+
+  /* ── SCORE BAR ── */
+  .section {
+    margin-bottom: 2.5rem;
+    animation: fadeUp 1s 0.2s ease both;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 0.5px;
+    background: rgba(212,175,112,0.2);
+  }
+
+  .score-row {
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+
+  .score-item {
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .score-label {
+    width: 70px; flex-shrink: 0;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 0.15em;
+  }
+  .score-bar-bg {
+    flex: 1; height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px; overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%; border-radius: 10px;
+    width: 0;
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .score-pct {
+    width: 36px; text-align: right;
+    font-size: 12px; color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── TRAITS ── */
+  .traits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    animation: fadeUp 1s 0.3s ease both;
+  }
+
+  .trait-card {
+    padding: 1rem 1.2rem;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+    border-radius: 12px;
+  }
+  .trait-icon { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  .trait-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.85rem; font-weight: 400;
+    color: var(--cream); margin-bottom: 0.3rem;
+    letter-spacing: 0.06em;
+  }
+  .trait-desc {
+    font-size: 0.78rem; color: var(--text-muted);
+    line-height: 1.6; letter-spacing: 0.03em;
+  }
+
+  /* ── BALANCE ── */
+  .balance-box {
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    border-left: 2px solid;
+    background: rgba(255,255,255,0.025);
+    animation: fadeUp 1s 0.4s ease both;
+  }
+  .balance-title {
+    font-size: 11px; letter-spacing: 0.2em;
+    margin-bottom: 0.8rem; opacity: 0.7;
+  }
+  .balance-list {
+    list-style: none; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .balance-list li {
+    font-size: 0.88rem; color: #B89070;
+    line-height: 1.6; letter-spacing: 0.04em;
+    display: flex; gap: 8px;
+  }
+  .balance-list li::before { content: '·'; color: var(--gold); }
+
+  /* ── PLAN CARDS ── */
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.9rem;
+    animation: fadeUp 1s 0.5s ease both;
+  }
+
+  .plan-card {
+    display: block;
+    text-decoration: none;
+    padding: 1.5rem 1.2rem;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.15);
+    border-radius: 14px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .plan-card:hover {
+    background: rgba(200,144,58,0.07);
+    border-color: rgba(212,175,112,0.4);
+    transform: translateY(-3px);
+  }
+  .plan-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+  .plan-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem; font-weight: 400;
+    color: var(--cream); letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+  .plan-sub {
+    font-size: 11px; color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+  .plan-arrow {
+    display: inline-block; margin-top: 0.8rem;
+    font-size: 11px; color: var(--gold-light);
+    letter-spacing: 0.15em; opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .plan-card:hover .plan-arrow {
+    opacity: 1; transform: translateX(3px);
+  }
+
+  /* ── RETRY ── */
+  .retry-wrap {
+    text-align: center;
+    margin-top: 2.5rem;
+    animation: fadeUp 1s 0.6s ease both;
+  }
+  .retry-btn {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.2em;
+    color: var(--text-muted);
+    background: none;
+    border: 0.5px solid rgba(212,175,112,0.2);
+    border-radius: 60px;
+    padding: 0.6rem 2rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none; display: inline-block;
+  }
+  .retry-btn:hover {
+    color: var(--cream);
+    border-color: rgba(212,175,112,0.5);
+  }
+
+  /* Divider ornament */
+  .ornament-divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 2.5rem 0;
+  }
+  .ornament-divider-line {
+    height: 0.5px; flex: 1;
+    background: rgba(212,175,112,0.15);
+  }
+  .ornament-divider-symbol {
+    font-size: 14px; color: var(--gold-light); opacity: 0.4;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grain"></div>
+<div class="dosha-glow" id="doshaGlow"></div>
+
+<div class="page">
+  <a href="quiz.html" class="back-link">← 重新作答</a>
+
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <div class="dosha-icon-wrap" id="iconWrap">
+      <div class="dosha-icon-ring" id="ring1"></div>
+      <div class="dosha-icon-ring-2" id="ring2"></div>
+      <div class="dosha-emoji" id="doshaEmoji"></div>
+    </div>
+    <div class="result-label">你的主要体质</div>
+    <div class="dosha-title" id="doshaTitle"></div>
+    <div class="dosha-sanskrit" id="doshaSanskrit"></div>
+    <div id="dualBadge"></div>
+    <p class="dosha-tagline" id="doshaTagline"></p>
+  </div>
+
+  <!-- SCORES -->
+  <div class="section">
+    <div class="section-title">体质分布</div>
+    <div class="score-row" id="scoreRow"></div>
+  </div>
+
+  <div class="ornament-divider">
+    <div class="ornament-divider-line"></div>
+    <div class="ornament-divider-symbol">✾</div>
+    <div class="ornament-divider-line"></div>
+  </div>
+
+  <!-- TRAITS -->
+  <div class="section">
+    <div class="section-title">核心特质</div>
+    <div class="traits-grid" id="traitsGrid"></div>
+  </div>
+
+  <!-- IMBALANCE -->
+  <div class="section">
+    <div class="section-title">失衡警示</div>
+    <div class="balance-box" id="balanceBox">
+      <div class="balance-title" id="balanceTitle"></div>
+      <ul class="balance-list" id="balanceList"></ul>
+    </div>
+  </div>
+
+  <div class="ornament-divider">
+    <div class="ornament-divider-line"></div>
+    <div class="ornament-divider-symbol">✾</div>
+    <div class="ornament-divider-line"></div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="section">
+    <div class="section-title">你的专属方案</div>
+    <div class="plan-grid" id="planGrid"></div>
+  </div>
+
+  <!-- RETRY -->
+  <div class="retry-wrap">
+    <a href="quiz.html" class="retry-btn">↺ &nbsp;重新检测</a>
+  </div>
+</div>
+
+<script>
+const DOSHA_DATA = {
+  vata: {
+    title: "风型体质",
+    sanskrit: "Vāta Prakriti",
+    emoji: `<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" fill="#4A8C5C" opacity="0.25"/><path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" stroke="#6B9E78" stroke-width="1.2" stroke-linejoin="round"/><line x1="10" y1="44" x2="46" y2="9" stroke="#6B9E78" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/><path d="M20 38 Q28 28 38 16" stroke="#A8CDB2" stroke-width="0.8" opacity="0.5"/><path d="M16 41 Q24 32 35 20" stroke="#A8CDB2" stroke-width="0.8" opacity="0.4"/></svg>`,
+    color: "#6B9E78",
+    colorLight: "#A8CDB2",
+    colorDark: "#3D6B4A",
+    glow: "rgba(107,158,120,0.12)",
+    tagline: "你如风般灵动自由，思维活跃、富有创意\n内心敏感细腻，是天生的感知者与创造者",
+    traits: [
+      { icon: "🌬️", name: "灵动创意", desc: "思维跳跃，点子层出不穷，善于联想与创造" },
+      { icon: "🦋", name: "感知敏锐", desc: "对环境变化高度敏感，直觉强，情感丰富" },
+      { icon: "✨", name: "热情活力", desc: "充满激情与好奇心，喜欢尝试新鲜事物" },
+      { icon: "🍃", name: "适应灵活", desc: "能快速适应变化，喜欢多样性与自由" }
+    ],
+    imbalance: {
+      title: "当风型失衡时，你可能出现以下问题",
+      items: [
+        "焦虑、思绪过多，难以放松或入睡",
+        "皮肤干燥、关节不适、便秘",
+        "注意力涣散，难以坚持完成计划",
+        "情绪波动大，容易感到孤独与不安"
+      ]
+    }
+  },
+  pitta: {
+    title: "火型体质",
+    sanskrit: "Pitta Prakriti",
+    emoji: "🔥",
+
+    color: "#C85A3A",
+    colorLight: "#E89A82",
+    colorDark: "#8B3220",
+    glow: "rgba(200,90,58,0.12)",
+    tagline: "你如火焰般炽热专注，意志坚定、执行力强\n天生的领导者，追求卓越是你的本能",
+    traits: [
+      { icon: "🎯", name: "目标专注", desc: "思维清晰，善于分析，能迅速找到问题核心" },
+      { icon: "⚡", name: "执行力强", desc: "行动力出众，不拖延，追求高效与完美" },
+      { icon: "🦁", name: "天生领导", desc: "自信果断，有感召力，擅长组织与激励他人" },
+      { icon: "💡", name: "智识敏锐", desc: "学习力强，逻辑严密，喜欢辩证与探索真理" }
+    ],
+    imbalance: {
+      title: "当火型失衡时，你可能出现以下问题",
+      items: [
+        "易怒、烦躁，对他人要求过高",
+        "皮肤发炎、胃酸过多、眼睛充血",
+        "过度竞争，难以放松与享受当下",
+        "批评他人，苛责自己，完美主义倾向"
+      ]
+    }
+  },
+  kapha: {
+    title: "土型体质",
+    sanskrit: "Kapha Prakriti",
+    emoji: `<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="26,6 48,44 4,44" fill="#5A3D28" opacity="0.3"/><polygon points="26,6 48,44 4,44" stroke="#8B6347" stroke-width="1.4" stroke-linejoin="round"/><polygon points="26,14 42,40 10,40" stroke="#BFA08A" stroke-width="0.7" opacity="0.5"/><polygon points="26,22 36,38 16,38" stroke="#BFA08A" stroke-width="0.5" opacity="0.3"/><circle cx="26" cy="6" r="1.5" fill="#8B6347"/><circle cx="48" cy="44" r="1.5" fill="#8B6347"/><circle cx="4" cy="44" r="1.5" fill="#8B6347"/></svg>`,
+    color: "#8B6347",
+    colorLight: "#BFA08A",
+    colorDark: "#5A3D28",
+    glow: "rgba(139,99,71,0.12)",
+    tagline: "你如大地般厚实稳健，忠诚温暖、滋养他人\n天生的守护者，给身边的人带来安全与平静",
+    traits: [
+      { icon: "🏔️", name: "稳定踏实", desc: "情绪稳定，不轻易被外界影响，可靠如磐石" },
+      { icon: "❤️", name: "深情忠诚", desc: "重感情，对亲近的人付出深厚的爱与关怀" },
+      { icon: "🌱", name: "持久耐力", desc: "行动缓慢但坚定，一旦开始不轻易放弃" },
+      { icon: "🤝", name: "滋养他人", desc: "天生的倾听者与照顾者，让人感到安心" }
+    ],
+    imbalance: {
+      title: "当土型失衡时，你可能出现以下问题",
+      items: [
+        "体重增加、水肿、消化迟缓、嗜睡",
+        "情感依赖，难以放手，执着于过去",
+        "行动迟缓，缺乏动力，容易陷入懒惰",
+        "鼻塞、黏液过多，呼吸道容易不适"
+      ]
+    }
+  }
+};
+
+function getParams() {
+  const p = new URLSearchParams(window.location.search);
+  return {
+    vata: parseInt(p.get('vata') || 0),
+    pitta: parseInt(p.get('pitta') || 0),
+    kapha: parseInt(p.get('kapha') || 0)
+  };
+}
+
+function determineDosha(scores) {
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const primary = sorted[0][0];
+  const isDual = sorted[0][1] - sorted[1][1] <= 2;
+  return { primary, secondary: sorted[1][0], isDual };
+}
+
+function init() {
+  const scores = getParams();
+  const total = scores.vata + scores.pitta + scores.kapha || 20;
+  const { primary, secondary, isDual } = determineDosha(scores);
+  const data = DOSHA_DATA[primary];
+
+  // Glow
+  document.getElementById('doshaGlow').style.background =
+    `radial-gradient(ellipse 60% 50% at 50% 30%, ${data.glow} 0%, transparent 70%)`;
+
+  // Hero
+  document.getElementById('doshaEmoji').innerHTML = data.emoji;
+  document.getElementById('ring1').style.borderColor = data.colorLight;
+  document.getElementById('ring2').style.borderColor = data.color;
+  document.getElementById('doshaTitle').textContent = data.title;
+  document.getElementById('doshaTitle').style.color = data.colorLight;
+  document.getElementById('doshaSanskrit').textContent = data.sanskrit;
+  document.getElementById('doshaTagline').textContent = data.tagline;
+
+  if (isDual) {
+    document.getElementById('dualBadge').innerHTML =
+      `<span class="dual-badge">双重体质：${DOSHA_DATA[secondary].title}</span>`;
+  }
+
+  // Scores
+  const scoreRow = document.getElementById('scoreRow');
+  [
+    { key: 'vata', label: 'Vāta', color: DOSHA_DATA.vata.color },
+    { key: 'pitta', label: 'Pitta', color: DOSHA_DATA.pitta.color },
+    { key: 'kapha', label: 'Kapha', color: DOSHA_DATA.kapha.color }
+  ].forEach(d => {
+    const pct = Math.round(scores[d.key] / total * 100);
+    const row = document.createElement('div');
+    row.className = 'score-item';
+    row.innerHTML = `
+      <div class="score-label" style="color:${d.color}">${d.label}</div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" data-pct="${pct}" style="background:${d.color}"></div>
+      </div>
+      <div class="score-pct">${pct}%</div>
+    `;
+    scoreRow.appendChild(row);
+  });
+
+  // Animate bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 300);
+
+  // Traits
+  const grid = document.getElementById('traitsGrid');
+  data.traits.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'trait-card';
+    card.innerHTML = `
+      <div class="trait-icon">${t.icon}</div>
+      <div class="trait-name">${t.name}</div>
+      <div class="trait-desc">${t.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Balance box
+  document.getElementById('balanceBox').style.borderLeftColor = data.color;
+  document.getElementById('balanceTitle').textContent = data.imbalance.title;
+  document.getElementById('balanceTitle').style.color = data.colorLight;
+  const list = document.getElementById('balanceList');
+  data.imbalance.items.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    list.appendChild(li);
+  });
+
+  // Plan cards
+  const plans = [
+    { icon: '🥗', name: '饮食指导', sub: '适合你的食物与禁忌', href: `diet.html?dosha=${primary}` },
+    { icon: '🧘', name: '瑜伽指导', sub: '平衡体质的体式练习', href: `yoga.html?dosha=${primary}` },
+    { icon: '🪷', name: '冥想指导', sub: '安定身心的冥想方式', href: `meditation.html?dosha=${primary}` }
+  ];
+  const planGrid = document.getElementById('planGrid');
+  plans.forEach(p => {
+    const card = document.createElement('a');
+    card.className = 'plan-card';
+    card.href = p.href;
+    card.innerHTML = `
+      <div class="plan-icon">${p.icon}</div>
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-sub">${p.sub}</div>
+      <div class="plan-arrow">探索方案 →</div>
+    `;
+    planGrid.appendChild(card);
+  });
+}
+
+init();
+</script>
+</body>
+</html>

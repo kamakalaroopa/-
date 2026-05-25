@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阿育吠陀体质检测</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Cinzel:wght@400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5ECD7;
+    --warm-white: #FBF6EC;
+    --sand: #E8D5B0;
+    --gold: #C8903A;
+    --gold-light: #D4AF70;
+    --brown-mid: #8B5E3C;
+    --brown-dark: #4A2E1A;
+    --brown-deep: #2E1A0E;
+    --text-main: #3D2010;
+    --text-muted: #7A5035;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--brown-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Layered background */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, #6B3A1F 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 100% 100%, #3D1F0A 0%, transparent 50%),
+      radial-gradient(ellipse 50% 70% at 0% 80%, #4A2810 0%, transparent 50%),
+      linear-gradient(160deg, #2A1208 0%, #1C0D05 50%, #0E0703 100%);
+    z-index: 0;
+  }
+
+  /* Mandala SVG background */
+  .mandala-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(90vw, 700px);
+    height: min(90vw, 700px);
+    opacity: 0.07;
+    z-index: 1;
+    animation: rotateSlow 120s linear infinite;
+  }
+
+  @keyframes rotateSlow {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  /* Grain texture overlay */
+  .grain {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Corner decorations */
+  .corner {
+    position: fixed;
+    width: 140px;
+    height: 140px;
+    z-index: 3;
+    opacity: 0.35;
+  }
+  .corner-tl { top: 0; left: 0; }
+  .corner-tr { top: 0; right: 0; transform: scaleX(-1); }
+  .corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+  .corner-br { bottom: 0; right: 0; transform: scale(-1); }
+
+  /* Main card */
+  .card {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 3.5rem 4rem;
+    max-width: 640px;
+    width: 90%;
+    animation: fadeUp 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Top ornament */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+    animation: fadeUp 1.4s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .ornament-line {
+    height: 1px;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, var(--gold-light));
+  }
+  .ornament-line.right {
+    background: linear-gradient(90deg, var(--gold-light), transparent);
+  }
+  .ornament-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .ornament-lotus {
+    font-size: 22px;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  /* Sanskrit subtitle */
+  .sanskrit {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    opacity: 0.8;
+    animation: fadeUp 1.4s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Main title */
+  h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.3;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+    animation: fadeUp 1.4s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  h1 span {
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 1.6rem auto;
+    animation: fadeUp 1.4s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .divider-line {
+    height: 0.5px;
+    width: 80px;
+    background: var(--gold-light);
+    opacity: 0.5;
+  }
+  .divider-diamond {
+    width: 5px; height: 5px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* Description */
+  .desc {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    font-weight: 300;
+    color: #C9A882;
+    line-height: 2;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.8rem;
+    animation: fadeUp 1.4s 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Dosha pills */
+  .doshas {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0 2.5rem;
+    animation: fadeUp 1.4s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .dosha-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0.7rem 1.2rem;
+    border: 0.5px solid rgba(212,175,112,0.3);
+    border-radius: 60px;
+    background: rgba(255,255,255,0.03);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .dosha-pill:hover {
+    background: rgba(200,144,58,0.1);
+    border-color: rgba(212,175,112,0.6);
+  }
+  .dosha-icon { font-size: 1.3rem; }
+  .dosha-name {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold-light);
+  }
+  .dosha-zh {
+    font-size: 11px;
+    color: #9A7050;
+    letter-spacing: 0.05em;
+  }
+
+  /* CTA Button */
+  .btn {
+    display: inline-block;
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, #C8903A 0%, #A06B22 100%);
+    color: var(--cream);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-decoration: none;
+    border-radius: 60px;
+    border: 1px solid rgba(212,175,112,0.4);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: fadeUp 1.4s 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(200,144,58,0.35);
+  }
+  .btn:active { transform: translateY(0); }
+
+  /* Footer note */
+  .footer-note {
+    margin-top: 2rem;
+    font-size: 11px;
+    color: #5A3820;
+    letter-spacing: 0.1em;
+    animation: fadeUp 1.4s 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Floating particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    opacity: 0;
+    animation: floatUp var(--dur) var(--delay) ease-in infinite;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+    20%  { opacity: 0.4; }
+    80%  { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-100vh) scale(1.5); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grain"></div>
+
+<!-- Corner SVG decorations -->
+<svg class="corner corner-tl" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 L140 0 L140 10 Q60 10 10 60 L0 60 Z" fill="#C8903A" opacity="0.5"/>
+  <path d="M0 0 L0 140 L10 140 Q10 60 60 10 L60 0 Z" fill="#C8903A" opacity="0.5"/>
+  <circle cx="10" cy="10" r="4" fill="#D4AF70"/>
+  <path d="M20 0 L20 5 M0 20 L5 20 M30 0 L30 3 M0 30 L3 30" stroke="#D4AF70" stroke-width="0.5"/>
+</svg>
+<svg class="corner corner-tr" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 L140 0 L140 10 Q60 10 10 60 L0 60 Z" fill="#C8903A" opacity="0.5"/>
+  <path d="M0 0 L0 140 L10 140 Q10 60 60 10 L60 0 Z" fill="#C8903A" opacity="0.5"/>
+  <circle cx="10" cy="10" r="4" fill="#D4AF70"/>
+  <path d="M20 0 L20 5 M0 20 L5 20 M30 0 L30 3 M0 30 L3 30" stroke="#D4AF70" stroke-width="0.5"/>
+</svg>
+<svg class="corner corner-bl" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 L140 0 L140 10 Q60 10 10 60 L0 60 Z" fill="#C8903A" opacity="0.5"/>
+  <path d="M0 0 L0 140 L10 140 Q10 60 60 10 L60 0 Z" fill="#C8903A" opacity="0.5"/>
+  <circle cx="10" cy="10" r="4" fill="#D4AF70"/>
+  <path d="M20 0 L20 5 M0 20 L5 20 M30 0 L30 3 M0 30 L3 30" stroke="#D4AF70" stroke-width="0.5"/>
+</svg>
+<svg class="corner corner-br" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 L140 0 L140 10 Q60 10 10 60 L0 60 Z" fill="#C8903A" opacity="0.5"/>
+  <path d="M0 0 L0 140 L10 140 Q10 60 60 10 L60 0 Z" fill="#C8903A" opacity="0.5"/>
+  <circle cx="10" cy="10" r="4" fill="#D4AF70"/>
+  <path d="M20 0 L20 5 M0 20 L5 20 M30 0 L30 3 M0 30 L3 30" stroke="#D4AF70" stroke-width="0.5"/>
+</svg>
+
+<!-- Mandala background -->
+<svg class="mandala-bg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(250,250)" fill="none" stroke="#D4AF70" stroke-width="0.8">
+    <circle r="220"/><circle r="190"/><circle r="160"/><circle r="130"/><circle r="100"/><circle r="70"/><circle r="40"/>
+    <g id="petal">
+      <ellipse rx="18" ry="50" transform="translate(0,-155)"/>
+      <ellipse rx="12" ry="35" transform="translate(0,-125)"/>
+      <circle r="4" transform="translate(0,-200)"/>
+    </g>
+    <use href="#petal" transform="rotate(30)"/>
+    <use href="#petal" transform="rotate(60)"/>
+    <use href="#petal" transform="rotate(90)"/>
+    <use href="#petal" transform="rotate(120)"/>
+    <use href="#petal" transform="rotate(150)"/>
+    <use href="#petal" transform="rotate(180)"/>
+    <use href="#petal" transform="rotate(210)"/>
+    <use href="#petal" transform="rotate(240)"/>
+    <use href="#petal" transform="rotate(270)"/>
+    <use href="#petal" transform="rotate(300)"/>
+    <use href="#petal" transform="rotate(330)"/>
+    <line x1="0" y1="-220" x2="0" y2="220"/>
+    <line x1="0" y1="-220" x2="0" y2="220" transform="rotate(30)"/>
+    <line x1="0" y1="-220" x2="0" y2="220" transform="rotate(60)"/>
+    <line x1="0" y1="-220" x2="0" y2="220" transform="rotate(90)"/>
+    <line x1="0" y1="-220" x2="0" y2="220" transform="rotate(120)"/>
+    <line x1="0" y1="-220" x2="0" y2="220" transform="rotate(150)"/>
+  </g>
+</svg>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Main Content -->
+<div class="card">
+
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <div class="ornament-dot"></div>
+    <div class="ornament-lotus">✾</div>
+    <div class="ornament-dot"></div>
+    <div class="ornament-line right"></div>
+  </div>
+
+  <div class="sanskrit">Āyurveda · 阿育吠陀</div>
+
+  <h1>探寻你的<br><span>自然体质</span></h1>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <p class="desc">
+    5000年古老智慧与你相遇<br>
+    了解你的 Dosha 体质，找回身心的天然平衡
+  </p>
+
+  <div class="doshas">
+    <div class="dosha-pill">
+      <span class="dosha-icon">🌬️</span>
+      <span class="dosha-name">Vāta</span>
+      <span class="dosha-zh">风型</span>
+    </div>
+    <div class="dosha-pill">
+      <span class="dosha-icon">🔥</span>
+      <span class="dosha-name">Pitta</span>
+      <span class="dosha-zh">火型</span>
+    </div>
+    <div class="dosha-pill">
+      <span class="dosha-icon">🌿</span>
+      <span class="dosha-name">Kapha</span>
+      <span class="dosha-zh">土型</span>
+    </div>
+  </div>
+
+  <a class="btn" href="quiz.html">开始体质检测 &nbsp;→</a>
+
+  <p class="footer-note">20道问题 · 约5分钟 · 个性化方案</p>
+
+</div>
+
+<script>
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      top: ${80 + Math.random() * 20}%;
+      --dur: ${6 + Math.random() * 10}s;
+      --delay: ${Math.random() * 8}s;
+      width: ${1 + Math.random() * 2}px;
+      height: ${1 + Math.random() * 2}px;
+    `;
+    container.appendChild(p);
+  }
+</script>
+
+</body>
+</html>

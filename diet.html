@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>饮食指导 · 阿育吠陀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Cinzel:wght@400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5ECD7;
+    --gold: #C8903A;
+    --gold-light: #D4AF70;
+    --brown-deep: #1C0D05;
+    --text-cream: #F0E2C8;
+    --text-muted: #9A7050;
+    --vata-color: #6B9E78;
+    --pitta-color: #C85A3A;
+    --kapha-color: #8B6347;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--brown-deep);
+    color: var(--text-cream);
+    min-height: 100vh;
+  }
+
+  .bg-layer {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 20% 10%, #2A1208 0%, transparent 60%),
+                radial-gradient(ellipse 60% 70% at 80% 90%, #1C0D05 0%, transparent 50%),
+                linear-gradient(160deg, #1C0D05 0%, #0E0703 100%);
+    z-index: 0;
+  }
+  .grain {
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03; z-index: 1; pointer-events: none;
+  }
+  .dosha-glow { position: fixed; inset: 0; z-index: 0; }
+
+  .page {
+    position: relative; z-index: 10;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* Nav */
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+  .back-link {
+    font-size: 12px; color: var(--text-muted);
+    text-decoration: none; letter-spacing: 0.1em;
+    transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .back-link:hover { color: var(--gold-light); }
+  .page-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); opacity: 0.7;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center; margin-bottom: 3rem;
+    animation: fadeUp 0.9s ease both;
+  }
+  .hero-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .hero-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.4em;
+    color: var(--gold-light); opacity: 0.65;
+    margin-bottom: 0.6rem;
+  }
+  .hero-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    font-weight: 300; letter-spacing: 0.1em;
+    color: var(--cream); margin-bottom: 0.8rem;
+  }
+  .hero-title span { font-weight: 400; }
+  .hero-desc {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 300;
+    color: #B89070; line-height: 1.9;
+    letter-spacing: 0.06em; max-width: 480px; margin: 0 auto;
+  }
+
+  /* Dosha tabs */
+  .dosha-tabs {
+    display: flex; gap: 0.6rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+  .tab-btn {
+    flex: 1; padding: 0.6rem 0.5rem;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.15);
+    border-radius: 8px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.08em;
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.25s; text-align: center;
+  }
+  .tab-btn:hover { border-color: rgba(212,175,112,0.35); color: var(--cream); }
+  .tab-btn.active {
+    color: var(--cream);
+    border-width: 1px;
+  }
+  .tab-icon { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+
+  /* Section title */
+  .section { margin-bottom: 2rem; animation: fadeUp 0.9s 0.15s ease both; }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 0.5px;
+    background: rgba(212,175,112,0.2);
+  }
+
+  /* Principle banner */
+  .principle-banner {
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    border-left: 2px solid;
+    background: rgba(255,255,255,0.025);
+    margin-bottom: 1.5rem;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 300;
+    color: #C9A882; line-height: 1.8; letter-spacing: 0.06em;
+  }
+
+  /* Food grid */
+  .food-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .food-col {
+    padding: 1.1rem 1.2rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+  }
+  .food-col-head {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; letter-spacing: 0.18em;
+    margin-bottom: 0.8rem;
+  }
+  .food-col-head .dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .food-list {
+    list-style: none; display: flex; flex-direction: column; gap: 0.45rem;
+  }
+  .food-list li {
+    font-size: 0.85rem; color: #B89070;
+    letter-spacing: 0.04em; line-height: 1.5;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .food-list li::before { content: '·'; color: var(--gold); flex-shrink: 0; }
+
+  /* Taste tags */
+  .taste-row {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .taste-tag {
+    padding: 5px 14px; border-radius: 60px;
+    font-size: 12px; letter-spacing: 0.12em;
+    border: 0.5px solid;
+  }
+  .taste-tag.good { background: rgba(107,158,120,0.1); border-color: rgba(107,158,120,0.35); color: #8DC49A; }
+  .taste-tag.avoid { background: rgba(200,90,58,0.08); border-color: rgba(200,90,58,0.3); color: #E89A82; }
+
+  /* Meal rhythm */
+  .meal-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+    margin-bottom: 1.5rem;
+  }
+  .meal-card {
+    padding: 1rem 0.9rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+    text-align: center;
+  }
+  .meal-time {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.2em;
+    color: var(--gold-light); opacity: 0.7;
+    margin-bottom: 0.4rem;
+  }
+  .meal-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .meal-desc {
+    font-size: 11px; color: var(--text-muted);
+    line-height: 1.6; letter-spacing: 0.03em;
+  }
+
+  /* Herbs */
+  .herb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.7rem;
+  }
+  .herb-card {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .herb-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .herb-info {}
+  .herb-name {
+    font-size: 0.85rem; color: var(--cream);
+    letter-spacing: 0.06em; margin-bottom: 2px;
+  }
+  .herb-effect {
+    font-size: 11px; color: var(--text-muted); letter-spacing: 0.03em;
+  }
+
+  /* Ornament */
+  .ornament-divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 2rem 0;
+  }
+  .ornament-divider-line { height: 0.5px; flex: 1; background: rgba(212,175,112,0.15); }
+  .ornament-divider-symbol { font-size: 14px; color: var(--gold-light); opacity: 0.4; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex; justify-content: center; gap: 1rem;
+    margin-top: 3rem;
+    animation: fadeUp 0.9s 0.4s ease both;
+  }
+  .nav-btn {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: var(--text-muted); text-decoration: none;
+    background: none;
+    border: 0.5px solid rgba(212,175,112,0.2);
+    border-radius: 60px; padding: 0.65rem 1.8rem;
+    cursor: pointer; transition: all 0.25s; display: inline-block;
+  }
+  .nav-btn:hover { color: var(--cream); border-color: rgba(212,175,112,0.5); }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, #C8903A 0%, #A06B22 100%);
+    border-color: rgba(212,175,112,0.4); color: var(--cream);
+  }
+  .nav-btn.primary:hover { box-shadow: 0 4px 20px rgba(200,144,58,0.3); transform: translateY(-1px); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grain"></div>
+<div class="dosha-glow" id="doshaGlow"></div>
+
+<div class="page">
+  <div class="top-nav">
+    <a href="javascript:history.back()" class="back-link">← 返回结果</a>
+    <div class="page-tag">Āhāra · 饮食之道</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-icon" id="heroIcon"></div>
+    <div class="hero-sub">专属饮食方案</div>
+    <h1 class="hero-title"><span id="doshaName"></span> 饮食指导</h1>
+    <p class="hero-desc" id="heroPrinciple"></p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dosha-tabs" id="doshaTabs">
+    <button class="tab-btn" onclick="switchDosha('vata')" id="tab-vata">
+      <span class="tab-icon">🪶</span>风型 Vāta
+    </button>
+    <button class="tab-btn" onclick="switchDosha('pitta')" id="tab-pitta">
+      <span class="tab-icon">🔥</span>火型 Pitta
+    </button>
+    <button class="tab-btn" onclick="switchDosha('kapha')" id="tab-kapha">
+      <span class="tab-icon">🔺</span>土型 Kapha
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div id="content"></div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <a href="javascript:history.back()" class="nav-btn">← 回到结果页</a>
+    <a id="yogaLink" href="yoga.html" class="nav-btn primary">瑜伽指导 →</a>
+  </div>
+</div>
+
+<script>
+const DIET = {
+  vata: {
+    icon: "🪶",
+    name: "风型",
+    color: "#6B9E78",
+    colorLight: "#A8CDB2",
+    glow: "rgba(107,158,120,0.1)",
+    principle: "风型体质易干燥、散乱，饮食应以「温暖、滋润、稳定」为核心原则。规律进食、热食为主，帮助扎根身心。",
+    tastes: {
+      good: ["甜味", "酸味", "咸味"],
+      avoid: ["苦味", "辛辣", "涩味"]
+    },
+    eat: [
+      "温热熟食（汤、炖菜、粥）",
+      "芝麻油、酥油、橄榄油",
+      "根茎蔬菜（胡萝卜、甜菜、南瓜）",
+      "熟透的甜水果（香蕉、芒果、枣）",
+      "全谷物（糙米、燕麦、小麦）",
+      "坚果（杏仁、腰果、核桃）",
+      "温牛奶、酸奶、奶酪",
+      "豆腐（温热烹调）"
+    ],
+    avoid: [
+      "生冷食物与冷饮",
+      "干燥零食（薯片、爆米花、饼干）",
+      "豆类（容易胀气）",
+      "咖啡因与酒精",
+      "苦瓜、芹菜等苦涩蔬菜",
+      "隔夜食物与加工食品"
+    ],
+    meals: [
+      { time: "早餐", icon: "🌅", desc: "温热粥品或燕麦，加入酥油与枣" },
+      { time: "午餐", icon: "☀️", desc: "全天最重要的一餐，温热米饭配炖菜" },
+      { time: "晚餐", icon: "🌙", desc: "轻食为主，汤品或蒸煮蔬菜，日落前完成" }
+    ],
+    herbs: [
+      { icon: "🫚", name: "姜黄", effect: "暖胃助消化" },
+      { icon: "🌿", name: "小茴香", effect: "缓解胀气" },
+      { icon: "🌰", name: "肉桂", effect: "温暖滋补" },
+      { icon: "🫛", name: "豆蔻", effect: "促进消化" },
+      { icon: "🪴", name: "南非醉茄", effect: "滋补安神" },
+      { icon: "🌱", name: "芦荟", effect: "滋润降燥" }
+    ]
+  },
+  pitta: {
+    icon: "🔥",
+    name: "火型",
+    color: "#C85A3A",
+    colorLight: "#E89A82",
+    glow: "rgba(200,90,58,0.1)",
+    principle: "火型体质内热旺盛，饮食应以「清凉、甘甜、适度」为核心原则。避免辛辣刺激，多摄入清凉降火的食物，保持身心平衡。",
+    tastes: {
+      good: ["甜味", "苦味", "涩味"],
+      avoid: ["辛辣", "酸味", "咸味"]
+    },
+    eat: [
+      "清凉蔬菜（黄瓜、芦笋、西兰花、莴苣）",
+      "甜味水果（椰子、甜瓜、葡萄、梨、苹果）",
+      "椰子油、向日葵油、橄榄油",
+      "全谷物（白米、大麦、燕麦）",
+      "绿豆、扁豆（适量）",
+      "新鲜牛奶、酥油、椰奶",
+      "薄荷、香菜、莳萝等清凉香草",
+      "玫瑰花茶、薄荷茶"
+    ],
+    avoid: [
+      "辛辣食物（辣椒、大蒜、洋葱）",
+      "酸性食物（番茄、醋、柑橘类）",
+      "红肉与油炸食品",
+      "酒精与咖啡因",
+      "过咸的腌制食品",
+      "正午在烈日下进食"
+    ],
+    meals: [
+      { time: "早餐", icon: "🌅", desc: "椰奶燕麦或新鲜水果，避免跳过早餐" },
+      { time: "午餐", icon: "☀️", desc: "全天最大餐，但避免正午最热时大量进食" },
+      { time: "晚餐", icon: "🌙", desc: "清淡蔬菜汤或沙拉，晚上6点前完成" }
+    ],
+    herbs: [
+      { icon: "🌿", name: "薄荷", effect: "清凉降火" },
+      { icon: "🌸", name: "玫瑰", effect: "舒肝解郁" },
+      { icon: "🫚", name: "芫荽", effect: "清热解毒" },
+      { icon: "🌱", name: "苦楝", effect: "清热平衡" },
+      { icon: "🍃", name: "甘草", effect: "滋阴润燥" },
+      { icon: "🪴", name: "蒲公英", effect: "清肝降火" }
+    ]
+  },
+  kapha: {
+    icon: "🔺",
+    name: "土型",
+    color: "#8B6347",
+    colorLight: "#BFA08A",
+    glow: "rgba(139,99,71,0.1)",
+    principle: "土型体质沉重湿润，饮食应以「轻盈、温燥、刺激」为核心原则。少油少甜，多摄入辛香料和苦涩蔬菜，激活代谢与活力。",
+    tastes: {
+      good: ["辛辣", "苦味", "涩味"],
+      avoid: ["甜味", "酸味", "咸味"]
+    },
+    eat: [
+      "苦涩蔬菜（苦瓜、芝麻叶、菠菜、芹菜）",
+      "辛辣香料（姜、黑胡椒、辣椒、芥末）",
+      "豆类（红豆、黑豆、鹰嘴豆）",
+      "轻谷物（小米、大麦、黑麦）",
+      "蜂蜜（少量，温热服用）",
+      "苹果、梨、石榴（低甜水果）",
+      "姜茶、薄荷茶、蜂蜜水",
+      "少量芥子油或葵花籽油"
+    ],
+    avoid: [
+      "甜食、糖果、蛋糕、冰淇淋",
+      "乳制品（牛奶、奶酪、酸奶）",
+      "油腻食物与煎炸食品",
+      "红肉与重口味食物",
+      "过量盐分",
+      "白米、白面等精制谷物"
+    ],
+    meals: [
+      { time: "早餐", icon: "🌅", desc: "轻食或跳过早餐，姜茶配少量水果" },
+      { time: "午餐", icon: "☀️", desc: "全天主餐，豆类配苦蔬菜，少油少盐" },
+      { time: "晚餐", icon: "🌙", desc: "极轻食或不吃，汤品或蒸蔬菜即可" }
+    ],
+    herbs: [
+      { icon: "🫚", name: "黑胡椒", effect: "激活代谢" },
+      { icon: "🌱", name: "姜", effect: "温阳祛湿" },
+      { icon: "🌿", name: "葫芦巴", effect: "减重助消" },
+      { icon: "🪴", name: "三辣果", effect: "排毒净化" },
+      { icon: "🌸", name: "印度楝", effect: "清热燥湿" },
+      { icon: "🍃", name: "芥子", effect: "化痰行气" }
+    ]
+  }
+};
+
+let currentDosha = 'vata';
+
+function getDosha() {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('dosha') || 'vata';
+}
+
+function switchDosha(dosha) {
+  currentDosha = dosha;
+  renderContent();
+  updateTabs();
+  updateYogaLink();
+}
+
+function updateTabs() {
+  ['vata','pitta','kapha'].forEach(d => {
+    const tab = document.getElementById('tab-' + d);
+    tab.classList.toggle('active', d === currentDosha);
+    tab.style.borderColor = d === currentDosha ? DIET[d].color : '';
+    tab.style.color = d === currentDosha ? DIET[d].colorLight : '';
+  });
+}
+
+function updateYogaLink() {
+  document.getElementById('yogaLink').href = `yoga.html?dosha=${currentDosha}`;
+}
+
+function renderContent() {
+  const d = DIET[currentDosha];
+
+  // Hero
+  document.getElementById('heroIcon').textContent = d.icon;
+  document.getElementById('doshaName').textContent = d.name;
+  document.getElementById('heroPrinciple').textContent = d.principle;
+  document.getElementById('doshaGlow').style.background =
+    `radial-gradient(ellipse 60% 40% at 50% 20%, ${d.glow} 0%, transparent 70%)`;
+
+  // Content
+  const container = document.getElementById('content');
+  container.innerHTML = `
+    <!-- Principle -->
+    <div class="section">
+      <div class="section-title">适合口味</div>
+      <div class="taste-row">
+        ${d.tastes.good.map(t => `<span class="taste-tag good">✓ ${t}</span>`).join('')}
+        ${d.tastes.avoid.map(t => `<span class="taste-tag avoid">✕ ${t}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- Food cols -->
+    <div class="section">
+      <div class="section-title">饮食建议</div>
+      <div class="food-cols">
+        <div class="food-col">
+          <div class="food-col-head" style="color:${d.colorLight}">
+            <div class="dot" style="background:${d.color}"></div>
+            宜多食用
+          </div>
+          <ul class="food-list">
+            ${d.eat.map(f => `<li>${f}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="food-col">
+          <div class="food-col-head" style="color:#E89A82">
+            <div class="dot" style="background:#C85A3A"></div>
+            尽量避免
+          </div>
+          <ul class="food-list">
+            ${d.avoid.map(f => `<li>${f}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ornament-divider">
+      <div class="ornament-divider-line"></div>
+      <div class="ornament-divider-symbol">✾</div>
+      <div class="ornament-divider-line"></div>
+    </div>
+
+    <!-- Meal rhythm -->
+    <div class="section">
+      <div class="section-title">三餐节律</div>
+      <div class="meal-cards">
+        ${d.meals.map(m => `
+          <div class="meal-card">
+            <div class="meal-time">${m.time}</div>
+            <div class="meal-icon">${m.icon}</div>
+            <div class="meal-desc">${m.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Herbs -->
+    <div class="section">
+      <div class="section-title">推荐香料与草药</div>
+      <div class="herb-grid">
+        ${d.herbs.map(h => `
+          <div class="herb-card">
+            <div class="herb-icon">${h.icon}</div>
+            <div class="herb-info">
+              <div class="herb-name">${h.name}</div>
+              <div class="herb-effect">${h.effect}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// Init
+currentDosha = getDosha();
+renderContent();
+updateTabs();
+updateYogaLink();
+</script>
+</body>
+</html>

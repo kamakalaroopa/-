@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瑜伽指导 · 阿育吠陀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Cinzel:wght@400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5ECD7;
+    --gold: #C8903A;
+    --gold-light: #D4AF70;
+    --brown-deep: #1C0D05;
+    --text-cream: #F0E2C8;
+    --text-muted: #9A7050;
+    --vata-color: #6B9E78;
+    --vata-light: #A8CDB2;
+    --pitta-color: #C85A3A;
+    --pitta-light: #E89A82;
+    --kapha-color: #8B6347;
+    --kapha-light: #BFA08A;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--brown-deep);
+    color: var(--text-cream);
+    min-height: 100vh;
+  }
+
+  .bg-layer {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 20% 10%, #2A1208 0%, transparent 60%),
+                radial-gradient(ellipse 60% 70% at 80% 90%, #1C0D05 0%, transparent 50%),
+                linear-gradient(160deg, #1C0D05 0%, #0E0703 100%);
+    z-index: 0;
+  }
+  .grain {
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03; z-index: 1; pointer-events: none;
+  }
+  .dosha-glow { position: fixed; inset: 0; z-index: 0; }
+
+  .page {
+    position: relative; z-index: 10;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* Nav */
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+  .back-link {
+    font-size: 12px; color: var(--text-muted);
+    text-decoration: none; letter-spacing: 0.1em;
+    transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .back-link:hover { color: var(--gold-light); }
+  .page-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); opacity: 0.7;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center; margin-bottom: 3rem;
+    animation: fadeUp 0.9s ease both;
+  }
+  .hero-icon { font-size: 3rem; margin-bottom: 1rem; line-height: 1; }
+  .hero-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.4em;
+    color: var(--gold-light); opacity: 0.65; margin-bottom: 0.6rem;
+  }
+  .hero-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    font-weight: 300; letter-spacing: 0.1em;
+    color: var(--cream); margin-bottom: 0.8rem;
+  }
+  .hero-title span { font-weight: 400; }
+  .hero-desc {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 300;
+    color: #B89070; line-height: 1.9;
+    letter-spacing: 0.06em; max-width: 480px; margin: 0 auto;
+  }
+
+  /* Dosha tabs */
+  .dosha-tabs {
+    display: flex; gap: 0.6rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+  .tab-btn {
+    flex: 1; padding: 0.6rem 0.5rem;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.15);
+    border-radius: 8px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.08em;
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.25s; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .tab-btn:hover { border-color: rgba(212,175,112,0.35); color: var(--cream); }
+  .tab-btn.active { color: var(--cream); border-width: 1px; }
+  .tab-icon { display: block; }
+
+  /* Section */
+  .section { margin-bottom: 2rem; animation: fadeUp 0.9s 0.15s ease both; }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.35em;
+    color: var(--gold); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 0.5px;
+    background: rgba(212,175,112,0.2);
+  }
+
+  /* Principle */
+  .principle-box {
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    border-left: 2px solid;
+    background: rgba(255,255,255,0.025);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem; font-weight: 300;
+    color: #C9A882; line-height: 1.8; letter-spacing: 0.06em;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Pose cards */
+  .pose-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  .pose-card {
+    padding: 1.2rem 1.3rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+    display: flex; gap: 1rem; align-items: flex-start;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .pose-card:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(212,175,112,0.28);
+  }
+  .pose-num {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem; font-weight: 400;
+    opacity: 0.18; line-height: 1;
+    flex-shrink: 0; width: 28px;
+  }
+  .pose-body {}
+  .pose-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem; font-weight: 400;
+    color: var(--cream); letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+  .pose-sanskrit {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.2em;
+    opacity: 0.45; margin-bottom: 0.5rem;
+  }
+  .pose-benefit {
+    font-size: 0.82rem; color: var(--text-muted);
+    line-height: 1.6; letter-spacing: 0.03em;
+  }
+  .pose-tag {
+    display: inline-block; margin-top: 0.5rem;
+    padding: 2px 10px; border-radius: 60px;
+    font-size: 10px; letter-spacing: 0.12em;
+    border: 0.5px solid;
+  }
+
+  /* Sequence strip */
+  .sequence-strip {
+    display: flex; gap: 0; overflow-x: auto;
+    border-radius: 12px; overflow: hidden;
+    margin-bottom: 1.5rem;
+    scrollbar-width: none;
+  }
+  .sequence-strip::-webkit-scrollbar { display: none; }
+  .seq-step {
+    flex: 1; min-width: 90px;
+    padding: 1rem 0.8rem;
+    background: rgba(255,255,255,0.025);
+    border-right: 0.5px solid rgba(212,175,112,0.1);
+    text-align: center;
+  }
+  .seq-step:last-child { border-right: none; }
+  .seq-time {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.15em;
+    opacity: 0.5; margin-bottom: 4px;
+  }
+  .seq-name {
+    font-size: 12px; color: var(--cream);
+    line-height: 1.4; letter-spacing: 0.04em;
+  }
+
+  /* Breath box */
+  .breath-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.7rem;
+  }
+  .breath-card {
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(212,175,112,0.12);
+  }
+  .breath-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .breath-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.9rem; color: var(--cream);
+    letter-spacing: 0.06em; margin-bottom: 0.3rem;
+  }
+  .breath-sanskrit {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; letter-spacing: 0.18em;
+    opacity: 0.4; margin-bottom: 0.4rem;
+  }
+  .breath-desc {
+    font-size: 11px; color: var(--text-muted);
+    line-height: 1.6; letter-spacing: 0.02em;
+  }
+
+  /* Tip box */
+  .tip-box {
+    padding: 1.1rem 1.4rem;
+    border-radius: 10px;
+    background: rgba(212,175,112,0.05);
+    border: 0.5px solid rgba(212,175,112,0.18);
+    font-size: 0.88rem; color: #B89070;
+    line-height: 1.7; letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .tip-box strong { color: var(--gold-light); font-weight: 400; }
+
+  /* Ornament */
+  .ornament-divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 2rem 0;
+  }
+  .ornament-divider-line { height: 0.5px; flex: 1; background: rgba(212,175,112,0.15); }
+  .ornament-divider-symbol { font-size: 14px; color: var(--gold-light); opacity: 0.4; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex; justify-content: center; gap: 1rem;
+    margin-top: 3rem;
+    animation: fadeUp 0.9s 0.4s ease both;
+  }
+  .nav-btn {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: var(--text-muted); text-decoration: none;
+    background: none;
+    border: 0.5px solid rgba(212,175,112,0.2);
+    border-radius: 60px; padding: 0.65rem 1.8rem;
+    cursor: pointer; transition: all 0.25s; display: inline-block;
+  }
+  .nav-btn:hover { color: var(--cream); border-color: rgba(212,175,112,0.5); }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, #C8903A 0%, #A06B22 100%);
+    border-color: rgba(212,175,112,0.4); color: var(--cream);
+  }
+  .nav-btn.primary:hover {
+    box-shadow: 0 4px 20px rgba(200,144,58,0.3);
+    transform: translateY(-1px);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grain"></div>
+<div class="dosha-glow" id="doshaGlow"></div>
+
+<div class="page">
+  <div class="top-nav">
+    <a href="javascript:history.back()" class="back-link">← 返回</a>
+    <div class="page-tag">Āsana · 体式之道</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-icon" id="heroIcon"></div>
+    <div class="hero-sub">专属瑜伽方案</div>
+    <h1 class="hero-title"><span id="doshaName"></span> 瑜伽指导</h1>
+    <p class="hero-desc" id="heroPrinciple"></p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dosha-tabs">
+    <button class="tab-btn" onclick="switchDosha('vata')" id="tab-vata">
+      <span class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" fill="#4A8C5C" opacity="0.3"/>
+          <path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" stroke="#6B9E78" stroke-width="1.5" stroke-linejoin="round"/>
+          <line x1="10" y1="44" x2="46" y2="9" stroke="#6B9E78" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+        </svg>
+      </span>
+      风型 Vāta
+    </button>
+    <button class="tab-btn" onclick="switchDosha('pitta')" id="tab-pitta">
+      <span class="tab-icon">🔥</span>
+      火型 Pitta
+    </button>
+    <button class="tab-btn" onclick="switchDosha('kapha')" id="tab-kapha">
+      <span class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="26,6 48,44 4,44" fill="#5A3D28" opacity="0.3"/>
+          <polygon points="26,6 48,44 4,44" stroke="#8B6347" stroke-width="1.5" stroke-linejoin="round"/>
+          <polygon points="26,14 42,40 10,40" stroke="#BFA08A" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="26" cy="6" r="1.8" fill="#8B6347"/>
+          <circle cx="48" cy="44" r="1.8" fill="#8B6347"/>
+          <circle cx="4" cy="44" r="1.8" fill="#8B6347"/>
+        </svg>
+      </span>
+      土型 Kapha
+    </button>
+  </div>
+
+  <div id="content"></div>
+
+  <div class="bottom-nav">
+    <a href="javascript:history.back()" class="nav-btn">← 返回</a>
+    <a id="meditationLink" href="meditation.html" class="nav-btn primary">冥想指导 →</a>
+  </div>
+</div>
+
+<script>
+const SVG_VATA = `<svg width="48" height="48" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" fill="#4A8C5C" opacity="0.25"/><path d="M10 44C14 36 20 28 32 18C38 13 46 9 46 9C46 9 44 18 40 24C35 32 26 38 18 42L10 44Z" stroke="#6B9E78" stroke-width="1.2" stroke-linejoin="round"/><line x1="10" y1="44" x2="46" y2="9" stroke="#6B9E78" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/><path d="M20 38 Q28 28 38 16" stroke="#A8CDB2" stroke-width="0.8" opacity="0.5"/></svg>`;
+const SVG_KAPHA = `<svg width="48" height="48" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="26,6 48,44 4,44" fill="#5A3D28" opacity="0.3"/><polygon points="26,6 48,44 4,44" stroke="#8B6347" stroke-width="1.4" stroke-linejoin="round"/><polygon points="26,14 42,40 10,40" stroke="#BFA08A" stroke-width="0.7" opacity="0.5"/><circle cx="26" cy="6" r="1.5" fill="#8B6347"/><circle cx="48" cy="44" r="1.5" fill="#8B6347"/><circle cx="4" cy="44" r="1.5" fill="#8B6347"/></svg>`;
+
+const YOGA = {
+  vata: {
+    icon: SVG_VATA,
+    name: "风型",
+    color: "#6B9E78",
+    colorLight: "#A8CDB2",
+    glow: "rgba(107,158,120,0.1)",
+    principle: "风型体质容易分散与焦虑，瑜伽练习应以「扎根、稳定、缓慢」为核心。选择有规律的练习，动作放慢，专注于呼吸与当下。",
+    style: "阴瑜伽 · 修复瑜伽 · 哈他瑜伽",
+    styleColor: "#6B9E78",
+    tip: "<strong>最佳练习时间：</strong>清晨日出后，避免天黑后激烈练习。每次练习前先做5分钟静坐扎根。保持温暖，练习场所不宜有风。",
+    poses: [
+      { name: "山式", sanskrit: "Tāḍāsana", benefit: "建立稳定感，扎根大地，平静散乱的思维", tag: "扎根" },
+      { name: "战士一式", sanskrit: "Vīrabhadrāsana I", benefit: "增强力量与稳定性，帮助建立信心与专注", tag: "稳定" },
+      { name: "婴儿式", sanskrit: "Bālāsana", benefit: "放松神经系统，缓解焦虑，给予安全感", tag: "放松" },
+      { name: "猫牛式", sanskrit: "Marjaryāsana", benefit: "温和活化脊椎，与呼吸同步，稳定情绪", tag: "流动" },
+      { name: "坐角式", sanskrit: "Upaviṣṭha Koṇāsana", benefit: "拉伸髋部与内侧，释放深层紧张与焦虑", tag: "舒展" },
+      { name: "挺尸式", sanskrit: "Śavāsana", benefit: "深度放松整个神经系统，至少保持15分钟", tag: "修复" }
+    ],
+    sequence: [
+      { time: "5分钟", name: "静坐扎根" },
+      { time: "10分钟", name: "热身流动" },
+      { time: "20分钟", name: "体式练习" },
+      { time: "5分钟", name: "深度放松" },
+      { time: "10分钟", name: "挺尸修复" }
+    ],
+    breaths: [
+      { icon: "🌬️", name: "鼻孔交替呼吸", sanskrit: "Nāḍī Śodhana", desc: "平衡左右气道，安定神经系统，缓解焦虑" },
+      { icon: "🫁", name: "腹式深呼吸", sanskrit: "Dīrgha Prāṇāyāma", desc: "激活副交感神经，帮助身心进入放松状态" },
+      { icon: "🌊", name: "喉式呼吸", sanskrit: "Ujjāyī", desc: "温暖身体，专注内心，减少思绪游荡" }
+    ]
+  },
+  pitta: {
+    icon: "🔥",
+    name: "火型",
+    color: "#C85A3A",
+    colorLight: "#E89A82",
+    glow: "rgba(200,90,58,0.1)",
+    principle: "火型体质容易过热与急躁，瑜伽练习应以「清凉、接受、温和」为核心。避免过于竞争性的练习，学会放下执着与追求完美。",
+    style: "月亮流 · 阴瑜伽 · 修复瑜伽",
+    styleColor: "#C85A3A",
+    tip: "<strong>最佳练习时间：</strong>清晨或傍晚，避免正午高温时练习。练习时保持室内凉爽，不要推挤极限，以舒适为度。",
+    poses: [
+      { name: "月亮式", sanskrit: "Chandrasana", benefit: "清凉降火，舒展身侧，平衡旺盛的内热", tag: "清凉" },
+      { name: "鱼式", sanskrit: "Matsyāsana", benefit: "打开胸腔，释放积压的挫败感与控制欲", tag: "开放" },
+      { name: "前屈折叠式", sanskrit: "Uttānāsana", benefit: "清凉大脑，缓解头痛与烦躁，放松神经", tag: "降火" },
+      { name: "坐姿扭转式", sanskrit: "Ardha Matsyendrāsana", benefit: "刺激肝胆排毒，疏导积聚的热气与情绪", tag: "排毒" },
+      { name: "蝴蝶式", sanskrit: "Baddha Koṇāsana", benefit: "放松髋部，释放紧绷的控制感，接受当下", tag: "释放" },
+      { name: "支撑桥式", sanskrit: "Setu Bandha", benefit: "修复性开胸，温和而不激进，滋养心脏", tag: "修复" }
+    ],
+    sequence: [
+      { time: "5分钟", name: "冷静意图设定" },
+      { time: "10分钟", name: "月亮流热身" },
+      { time: "20分钟", name: "清凉体式" },
+      { time: "5分钟", name: "扭转排毒" },
+      { time: "10分钟", name: "修复放松" }
+    ],
+    breaths: [
+      { icon: "❄️", name: "清凉呼吸", sanskrit: "Śītalī Prāṇāyāma", desc: "卷舌吸入凉气，降低内热，平息愤怒与烦躁" },
+      { icon: "🌙", name: "左鼻孔呼吸", sanskrit: "Chandra Bhedana", desc: "激活月亮（阴性）能量，清凉降火平衡" },
+      { icon: "🌊", name: "温和喉式呼吸", sanskrit: "Ujjāyī (soft)", desc: "以柔和方式练习，不产生过多内热" }
+    ]
+  },
+  kapha: {
+    icon: SVG_KAPHA,
+    name: "土型",
+    color: "#8B6347",
+    colorLight: "#BFA08A",
+    glow: "rgba(139,99,71,0.1)",
+    principle: "土型体质容易沉重与停滞，瑜伽练习应以「激活、流动、升温」为核心。选择有活力的动态练习，打破惰性，点燃内在的活力。",
+    style: "流瑜伽 · 太阳流 · 力量瑜伽",
+    styleColor: "#8B6347",
+    tip: "<strong>最佳练习时间：</strong>清晨6-8点，趁着Kapha时段激活身体最有效。哪怕只有15分钟，持续规律比偶尔长练更重要。",
+    poses: [
+      { name: "太阳致敬式", sanskrit: "Sūrya Namaskāra", benefit: "全身激活，升温，打破沉重感与惰性", tag: "激活" },
+      { name: "战士三式", sanskrit: "Vīrabhadrāsana III", benefit: "挑战平衡与专注，激发自信与行动力", tag: "挑战" },
+      { name: "弓式", sanskrit: "Dhanurāsana", benefit: "强力开胸，刺激消化，激活肾上腺", tag: "升温" },
+      { name: "船式", sanskrit: "Nāvāsana", benefit: "强化核心，激活消化之火，提升代谢", tag: "核心" },
+      { name: "骆驼式", sanskrit: "Uṣṭrāsana", benefit: "深度开胸，对抗土型的内向与封闭倾向", tag: "开放" },
+      { name: "倒箭式", sanskrit: "Viparīta Karaṇī", benefit: "调节淋巴循环，减少水肿，恢复精力", tag: "循环" }
+    ],
+    sequence: [
+      { time: "3分钟", name: "激活呼吸" },
+      { time: "10分钟", name: "太阳致敬" },
+      { time: "20分钟", name: "力量体式" },
+      { time: "5分钟", name: "扭转流动" },
+      { time: "7分钟", name: "平静收尾" }
+    ],
+    breaths: [
+      { icon: "🔆", name: "风箱式呼吸", sanskrit: "Bhastrikā", desc: "快速鼓动横膈膜，升温激活，消除沉重感" },
+      { icon: "☀️", name: "右鼻孔呼吸", sanskrit: "Sūrya Bhedana", desc: "激活太阳（阳性）能量，温热提振精神" },
+      { icon: "🌬️", name: "头颅清洁呼吸", sanskrit: "Kapālabhāti", desc: "快速主动呼气，清洁肺部，提振能量" }
+    ]
+  }
+};
+
+let currentDosha = 'vata';
+
+function getDosha() {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('dosha') || 'vata';
+}
+
+function switchDosha(dosha) {
+  currentDosha = dosha;
+  renderContent();
+  updateTabs();
+  updateLinks();
+}
+
+function updateTabs() {
+  ['vata','pitta','kapha'].forEach(d => {
+    const tab = document.getElementById('tab-' + d);
+    tab.classList.toggle('active', d === currentDosha);
+    tab.style.borderColor = d === currentDosha ? YOGA[d].color : '';
+    tab.style.color = d === currentDosha ? YOGA[d].colorLight : '';
+  });
+}
+
+function updateLinks() {
+  document.getElementById('meditationLink').href = `meditation.html?dosha=${currentDosha}`;
+}
+
+function renderContent() {
+  const d = YOGA[currentDosha];
+
+  document.getElementById('heroIcon').innerHTML = typeof d.icon === 'string' && d.icon.startsWith('<') ? d.icon : `<span style="font-size:3rem">${d.icon}</span>`;
+  document.getElementById('doshaName').textContent = d.name;
+  document.getElementById('heroPrinciple').textContent = d.principle;
+  document.getElementById('doshaGlow').style.background =
+    `radial-gradient(ellipse 60% 40% at 50% 20%, ${d.glow} 0%, transparent 70%)`;
+
+  document.getElementById('content').innerHTML = `
+    <!-- Style tag -->
+    <div class="section">
+      <div class="section-title">推荐练习风格</div>
+      <div class="principle-box" style="border-left-color:${d.color}">
+        <span style="color:${d.colorLight};letter-spacing:0.12em;font-family:'Cinzel',serif;font-size:12px">${d.style}</span><br><br>
+        ${d.principle}
+      </div>
+    </div>
+
+    <!-- Poses -->
+    <div class="section">
+      <div class="section-title">核心体式</div>
+      <div class="pose-grid">
+        ${d.poses.map((p, i) => `
+          <div class="pose-card">
+            <div class="pose-num" style="color:${d.color}">${String(i+1).padStart(2,'0')}</div>
+            <div class="pose-body">
+              <div class="pose-name">${p.name}</div>
+              <div class="pose-sanskrit">${p.sanskrit}</div>
+              <div class="pose-benefit">${p.benefit}</div>
+              <span class="pose-tag" style="color:${d.colorLight};border-color:${d.color};background:${d.glow}">${p.tag}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="ornament-divider">
+      <div class="ornament-divider-line"></div>
+      <div class="ornament-divider-symbol">✾</div>
+      <div class="ornament-divider-line"></div>
+    </div>
+
+    <!-- Sequence -->
+    <div class="section">
+      <div class="section-title">建议练习序列</div>
+      <div class="sequence-strip">
+        ${d.sequence.map(s => `
+          <div class="seq-step">
+            <div class="seq-time" style="color:${d.colorLight}">${s.time}</div>
+            <div class="seq-name">${s.name}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="tip-box">${d.tip}</div>
+    </div>
+
+    <!-- Breathwork -->
+    <div class="section">
+      <div class="section-title">配合呼吸法</div>
+      <div class="breath-cards">
+        ${d.breaths.map(b => `
+          <div class="breath-card">
+            <div class="breath-icon">${b.icon}</div>
+            <div class="breath-name">${b.name}</div>
+            <div class="breath-sanskrit">${b.sanskrit}</div>
+            <div class="breath-desc">${b.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+currentDosha = getDosha();
+renderContent();
+updateTabs();
+updateLinks();
+</script>
+</body>
+</html>
